@@ -16,7 +16,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+)
+
+from web.serializers import MyTokenObtainPairSerializer
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path(
+        "api/user/login/",
+        TokenObtainPairView.as_view(serializer_class=MyTokenObtainPairSerializer),
+        name="token_obtain_pair",
+    ),
 ]
