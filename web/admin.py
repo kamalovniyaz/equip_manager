@@ -1,3 +1,6 @@
 from django.contrib import admin
 
-# Register your models here.
+from web.models import Equipment, EquipmentType
+
+admin.site.register(Equipment)
+admin.site.register(EquipmentType)
