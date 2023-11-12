@@ -35,9 +35,19 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         return data
 
 
-class EquipmentSerializer(serializers.Serializer):
+class EquipmentTypeSerializer(serializers.ModelSerializer):
     """
-    Сериализация для модели оборудования
+    Сериализация типов оборудования
+    """
+
+    class Meta:
+        model = EquipmentType
+        fields = "__all__"
+
+
+class EquipmentSerializer(serializers.ModelSerializer):
+    """
+    Сериализация модели оборудования
     """
 
     class Meta:
@@ -46,7 +56,7 @@ class EquipmentSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         Equipment.objects.create(equipment_type=validated_data.get('equipment_type'),
-                                             serial_number=validated_data.get('serial_number'))
+                                 serial_number=validated_data.get('serial_number'))
         return True
 
     def validate_serial_numbers(self):
