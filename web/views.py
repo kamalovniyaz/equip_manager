@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from web.models import Equipment
+from web.models import Equipment, EquipmentType
 from web.serializers import EquipmentSerializer
 from web.services.get_equip_type_with_pagination import get_equipment_types
 from web.services.get_equip_with_pagination import get_equipments
@@ -64,10 +64,11 @@ class EquipmentManagement(APIView):
         :raises: HTTP 400 - Если отправленные данные не валидны.
         """
         serializer = EquipmentSerializer(data=request.data)
-        print(request.data)
-        if serializer.is_valid() and serializer.validate_serial_numbers():
+        if serializer.validate_serial_numbers() and serializer.is_valid():
             serializer.create(request.data)
-            return Response("The equipment has been successfully created", status=status.HTTP_201_CREATED)
+
+            return Response("Оборудование успешно создано", status=status.HTTP_201_CREATED)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request):
@@ -85,10 +86,14 @@ class EquipmentManagement(APIView):
             equipment_id = int(request.GET.get('id'))
             equipment = Equipment.objects.get(id=equipment_id)
             serializer = EquipmentSerializer(equipment, data=request.data)
-            if serializer.is_valid():
-                serializer.save()
+
+            if serializer.validate_serial_numbers() and serializer.is_valid():
+
+                serializer.update(equipment_id, request.data)
                 return Response(serializer.data)
+
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
         except Equipment.DoesNotExist:
             return Response("Equipment not found", status=status.HTTP_404_NOT_FOUND)
 
@@ -125,14 +130,19 @@ class EquipmentTypesListView(APIView):
     def get(self, request):
         search_param = request.GET.get('search', None)
         page_number = request.GET.get("page")
+        if page_number:
+            # Получение данных через пагинацию и с фильтрацией по параметру
+            equipment_types, total_items, total_pages = get_equipment_types(page_number, search_param)
 
-        # Получение данных через пагинацию и с фильтрацией по параметру
-        equipment_types, total_items, total_pages = get_equipment_types(page_number, search_param)
+            return Response(
+                {
+                    "equipment_types": equipment_types,
+                    "total_items": total_items,
+                    "total_pages": total_pages,
+                }
+            )
+        else:
+            equipment_types = EquipmentType.objects.values(
+                'name').distinct()  # Получаем уникальные значения типов для создания селекта
 
-        return JsonResponse(
-            {
-                "equipment_types": equipment_types,
-                "total_items": total_items,
-                "total_pages": total_pages,
-            }
-        )
+            return Response({"equipment_types": equipment_types})
