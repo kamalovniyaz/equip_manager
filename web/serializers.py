@@ -1,5 +1,6 @@
 import re
 
+from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
@@ -19,7 +20,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
             "password": attrs["password"],
         }
         try:
-            from django.contrib.auth.models import User
+
             user = User.objects.get(email=credentials["email"])
         except User.DoesNotExist:
             raise serializers.ValidationError(
@@ -49,14 +50,32 @@ class EquipmentSerializer(serializers.ModelSerializer):
     """
     Сериализация модели оборудования
     """
+    note = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
         model = Equipment
         fields = "__all__"
 
     def create(self, validated_data):
+        """
+        Метод для создания записи оборудования в БД
+        :param validated_data: Данные оборудования
+        :return: True
+        """
         Equipment.objects.create(equipment_type=validated_data.get('equipment_type'),
                                  serial_number=validated_data.get('serial_number'))
+        return True
+
+    def update(self, id, validated_data):
+        """
+                Метод для обновления данных оборудования в БД
+                :param validated_data: id, данные оборудования
+                :return: True
+                """
+        Equipment.objects.filter(id=id).update(equipment_type=self.initial_data.get("equipment_type"),
+                                               serial_number=self.initial_data.get("serial_number"),
+                                               is_active=self.initial_data.get("is_active"),
+                                               note=self.initial_data.get("note"))
         return True
 
     def validate_serial_numbers(self):
@@ -73,6 +92,16 @@ class EquipmentSerializer(serializers.ModelSerializer):
             equip_type = EquipmentType.objects.get(name=equipment_type)
         except EquipmentType.DoesNotExist:
             raise serializers.ValidationError("Неподдерживаемый тип оборудования")
+
+        # Проверяем есть ли такое оборудование в БД
+        try:
+            equipment_in_database = Equipment.objects.get(equipment_type=equipment_type, serial_number=serial_number)
+
+            if equipment_in_database:
+                raise serializers.ValidationError("Данное оборудование уже создано")
+
+        except Equipment.DoesNotExist:
+            pass
 
         # Создание регулярного выражения для каждой позиции в маске
         regex_patterns = {
