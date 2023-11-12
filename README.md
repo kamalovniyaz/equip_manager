@@ -43,5 +43,15 @@
 - ```npm run dev``` - запустить фронтенд
 ## Документация API
 Вся необходимая документация доступна в Swagger. Валидация масок для серийных номеров выполняется на основе предоставленных данных, где каждая буква или символ имеют свое ограничение.
-
+## Скриншоты
+![img_8.png](screenshots/img_8.png)
+![img.png](screenshots/img.png)
+![img_3.png](screenshots/img_3.png)
+![img_6.png](screenshots/img_6.png)
+![img_1.png](screenshots/img_1.png)
+![img_2.png](screenshots/img_2.png)
+![img_5.png](screenshots/img_5.png)
+![img_9.png](screenshots/img_9.png)
+![img_7.png](screenshots/img_7.png)
+![img_4.png](screenshots/img_4.png)
 
