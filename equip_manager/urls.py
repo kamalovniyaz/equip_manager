@@ -24,7 +24,7 @@ from rest_framework_simplejwt.views import (
 )
 
 from web.serializers import MyTokenObtainPairSerializer
-from web.views import EquipmentManagement
+from web.views import EquipmentManagement, EquipmentTypesListView
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -51,5 +51,6 @@ urlpatterns = [
         TokenObtainPairView.as_view(serializer_class=MyTokenObtainPairSerializer),
         name="token_obtain_pair",
     ),
-    path("api/equipment/", EquipmentManagement.as_view(), name="equipment_management")
+    path("api/equipment/", EquipmentManagement.as_view(), name="equipment_management"),
+    path("api/equipment-type/", EquipmentTypesListView.as_view(), name="equipment_types_list")
 ]
