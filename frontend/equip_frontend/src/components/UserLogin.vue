@@ -95,17 +95,18 @@ export default {
 
 <style scoped>
 .login-form {
-  display: flex;
-  flex-direction: column;
+  display: block;
   align-items: center;
   justify-content: center;
-  height: 100vh;
+  text-align: center;
+  margin-top: 200px;
+  margin-left: 500px;
 }
 
 .form-group {
   margin-bottom: 1rem;
   width: 100%;
-  max-width: 500px;
+  max-width: 400px;
   display: flex;
   flex-direction: column;
 }
@@ -133,23 +134,12 @@ export default {
   border-radius: 5px;
   cursor: pointer;
   width: 100%;
-  max-width: 500px;
+  max-width: 400px;
 }
 
 .form-button:hover {
   background-color: #2980b9;
 }
 
-.forgot-password-link {
-  margin-top: 1rem;
-  font-size: 0.9rem;
-  color: #3498db;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.forgot-password-link:hover {
-  text-decoration: underline;
-}
 
 </style>
