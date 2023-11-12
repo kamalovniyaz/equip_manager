@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <title>Главная</title>
+</head>
+<body>
+    <div id="app">
+        {% csrf_token %}
+        <h1>Загрузка...</h1>
+    </div>
+    <link rel="stylesheet" href="/frontend/equip_frontend/dist/assets/index.css">
+    <script type="module" src="/frontend/equip_frontend/dist/assets/index.js"></script>
+</body>
+</html>
