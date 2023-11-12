@@ -57,7 +57,7 @@ MIDDLEWARE = [
 
 # CORS
 CORS_ORIGIN_ALLOW_ALL = False
-CORS_ORIGIN_WHITELIST = ("http://localhost:8080",)  # Matches the port that Vue.js is using
+CORS_ORIGIN_WHITELIST = ("http://localhost:8080",)  
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
 ]
@@ -92,8 +92,8 @@ DATABASES = {
         'NAME': config("DB_NAME"),
         'USER': config("DB_USERNAME"),
         'PASSWORD': config("DB_PASSWORD"),
-        'HOST': 'localhost',  # Может отличаться, в зависимости от вашей конфигурации
-        'PORT': '',  # По умолчанию обычно используется порт MySQL
+        'HOST': 'localhost',  
+        'PORT': '', 
     }
 }
 
