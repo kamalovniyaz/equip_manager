@@ -1,4 +1,3 @@
-from django.core.paginator import Paginator
 from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -7,6 +6,8 @@ from rest_framework.views import APIView
 
 from web.models import Equipment
 from web.serializers import EquipmentSerializer
+from web.services.get_equip_type_with_pagination import get_equipment_types
+from web.services.get_equip_with_pagination import get_equipments
 
 
 # Create your views here.
@@ -24,18 +25,34 @@ class EquipmentManagement(APIView):
 
     def get(self, request):
         """
-        Получение информации об оборудовании по ID.
+        Получение информации об оборудовании. Если в get параметре есть Id, то выполняем получение одного элемента.
+        Если нет, то возвращаем пагинированный список.
 
         :param id: Id оборудования
         :return: Возвращает информацию об оборудовании в формате JSON.
         :raises: HTTP 404 - Если оборудование с указанным ID не найдено.
         """
         try:
-            equipment_id = int(request.GET.get('id'))
-            equipment = Equipment.objects.get(id=equipment_id)
-            serializer = EquipmentSerializer(equipment)
-            print(serializer.data)
-            return Response(serializer.data)
+            equipment_id = request.GET.get('id', None)
+            if equipment_id:
+                queryset = Equipment.objects.get(id=int(equipment_id))
+                serializer_class = EquipmentSerializer(queryset)
+
+                return Response({"equipment": serializer_class.data})
+            else:
+                search_param = request.GET.get('search', None)
+                page_number = request.GET.get("page")
+
+                # Получение данных через пагинацию и с фильтрацией по параметру
+                equipments, total_items, total_pages = get_equipments(page_number, search_param)
+
+                return JsonResponse(
+                    {
+                        "equipments": equipments,
+                        "total_items": total_items,
+                        "total_pages": total_pages,
+                    }
+                )
         except Equipment.DoesNotExist:
             return Response("Equipment not found", status=status.HTTP_404_NOT_FOUND)
 
@@ -96,7 +113,7 @@ class EquipmentManagement(APIView):
             return Response("Equipment not found", status=status.HTTP_404_NOT_FOUND)
 
 
-class EquipmentListView(APIView):
+class EquipmentTypesListView(APIView):
     """
        Вывод пагинированного списка оборудования.
        Есть возможность поиска путем указания query параметров советующим ключам ответа
@@ -107,27 +124,15 @@ class EquipmentListView(APIView):
 
     def get(self, request):
         search_param = request.GET.get('search', None)
-
-        # Фильтрация объектов по параметру поиска, если он задан
-        if search_param:
-            equipments = Equipment.objects.filter(
-                serial_number__icontains=search_param)
-        else:
-            equipments = Equipment.objects.all()
-
-        paginator = Paginator(equipments, 10)  # показывать 10 строк на странице
-
         page_number = request.GET.get("page")
-        page_obj = paginator.get_page(page_number)
 
-        total_items = paginator.count  # Общее количество элементов
-        total_pages = paginator.num_pages  # Общее количество страниц
-        serializer = EquipmentSerializer(page_obj, many=True)
+        # Получение данных через пагинацию и с фильтрацией по параметру
+        equipment_types, total_items, total_pages = get_equipment_types(page_number, search_param)
 
         return JsonResponse(
             {
-                "equipments": serializer.data,
-                "totalItems": total_items,
-                "totalPages": total_pages,
+                "equipment_types": equipment_types,
+                "total_items": total_items,
+                "total_pages": total_pages,
             }
         )
