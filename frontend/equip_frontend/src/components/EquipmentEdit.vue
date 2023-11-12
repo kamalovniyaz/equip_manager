@@ -1,6 +1,6 @@
 <template>
   <div class="centered-container">
-    <h2>Добавление оборудования</h2>
+    <h2>Изменения данных оборудования</h2>
   </div>
   <div class="new-equipment-add">
     <div class="form-columns">
