@@ -15,7 +15,7 @@ class Equipment(models.Model):
     equipment_type = models.CharField(verbose_name='Тип оборудования', max_length=50)
     serial_number = models.CharField(verbose_name='Серийный номер', max_length=50, unique=True)
     is_active = models.BooleanField(verbose_name='Активно', default=True)
-    note = models.TextField(verbose_name='Примечание')
+    note = models.TextField(verbose_name='Примечание', null=True)
 
     class Meta:
         unique_together = ('equipment_type', 'serial_number') # Связка уникальных полей
